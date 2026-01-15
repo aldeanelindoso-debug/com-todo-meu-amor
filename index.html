@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Mágico</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body, html{
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family:'Montserrat', sans-serif;
+    background:#000;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+
+/* Canvas de fundo */
+canvas#fundo{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:-1;
+}
+
+/* Container login */
+.login-container{
+    background:rgba(10,10,10,0.85);
+    padding:50px 40px;
+    border-radius:25px;
+    text-align:center;
+    box-shadow:0 0 60px rgba(255,77,125,0.7);
+    position:relative;
+    z-index:1;
+}
+
+/* Título */
+h1{
+    font-size:36px;
+    color:#ff4d7d;
+    text-shadow:0 0 15px #ff7aa2,0 0 30px #ff4d7d;
+    margin-bottom:30px;
+}
+
+/* Inputs */
+input{
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    border-radius:12px;
+    border:none;
+    font-size:16px;
+    outline:none;
+    background:#111;
+    color:#fff;
+    box-shadow:0 0 10px #ff4d7d inset;
+}
+input::placeholder{
+    color:#ff7aa2;
+}
+
+/* Botão mágico */
+button{
+    width:100%;
+    padding:15px;
+    margin-top:20px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#ff2f6d,#ff7aa2);
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    box-shadow:0 0 40px rgba(255,77,125,0.8);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 60px rgba(255,77,125,1);
+}
+
+/* Mensagem de erro */
+.alert{
+    color:#ff7aa2;
+    margin-top:15px;
+    font-size:16px;
+    display:none;
+}
+
+/* Corações flutuantes */
+.heart{
+    position:absolute;
+    width:20px;
+    height:20px;
+    background:red;
+    clip-path: polygon(50% 0%,61% 15%,75% 15%,85% 25%,85% 40%,75% 55%,50% 70%,25% 55%,15% 40%,15% 25%,25% 15%,39% 15%);
+    animation:blink 1s infinite;
+    pointer-events:none;
+}
+@keyframes blink{
+    0%,100%{transform: scale(1);}
+    50%{transform: scale(1.3);}
+}
+</style>
+</head>
+<body>
+
+<canvas id="fundo"></canvas>
+
+<div class="login-container">
+    <h1>Identifique-se</h1>
+    <input type="text" id="username" placeholder="Adicione teu nome">
+    <input type="password" id="password" placeholder="Adicione sua senha">
+    <button onclick="login(event)">Entrar</button>
+    <div class="alert" id="alertMsg">Nome ou senha incorretos!</div>
+</div>
+
+<script>
+// ===== Fundo animado com corações =====
+const canvas = document.getElementById("fundo");
+const ctx = canvas.getContext("2d");
+let hearts=[];
+function resize(){ 
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+    hearts=[];
+    for(let i=0;i<100;i++){
+        hearts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vy:Math.random()*-0.5-0.2, size:Math.random()*8+8});
+    }
+}
+window.addEventListener("resize",resize);
+resize();
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let h of hearts){
+        h.y+=h.vy;
+        if(h.y<0){h.y=canvas.height; h.x=Math.random()*canvas.width;}
+        ctx.fillStyle="rgba(255,0,50,0.6)";
+        ctx.beginPath();
+        ctx.moveTo(h.x,h.y);
+        ctx.arc(h.x, h.y-4, h.size/2, 0, Math.PI, true);
+        ctx.arc(h.x-h.size/2, h.y, h.size/2, 0, Math.PI, true);
+        ctx.lineTo(h.x, h.y+h.size);
+        ctx.closePath();
+        ctx.fill();
+    }
+    requestAnimationFrame(animate);
+}
+animate();
+
+// ===== Função de login com validação e redirecionamento =====
+function login(event){
+    const user = document.getElementById('username').value.toLowerCase();
+    const pass = document.getElementById('password').value.toLowerCase();
+    const alertMsg = document.getElementById('alertMsg');
+
+    // spawn corações vermelhos ao clicar
+    for(let i=0;i<15;i++){
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left=(event.clientX+Math.random()*30-15)+'px';
+        heart.style.top=(event.clientY+Math.random()*30-15)+'px';
+        heart.style.transform=`rotate(${Math.random()*360}deg)`;
+        document.body.appendChild(heart);
+        setTimeout(()=>heart.remove(),1000);
+    }
+
+    // validação de usuário e senha
+    if(user==='isa' && pass==='ciumenta'){
+        alertMsg.style.display='none';
+        window.location.href='isa/index.html'; // REDIRECIONA PARA ISA
+    } else {
+        alertMsg.style.display='block';
+    }
+}
+</script>
+
+</body>
+</html>
+
